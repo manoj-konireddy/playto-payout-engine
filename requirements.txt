@@ -3,3 +3,4 @@ djangorestframework
 celery
 redis
 psycopg[binary]
+gunicorn
