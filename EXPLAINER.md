@@ -108,3 +108,23 @@ with transaction.atomic():
 ```
 
 - This makes overdraft impossible under concurrent requests at DB level.
+
+## 6) Runtime Verification
+
+What was verified in deployment:
+
+- Live web app is deployed and serves the React dashboard.
+- PostgreSQL + Redis are connected via environment variables.
+- Web process runs migrations and seed data before serving.
+- Celery worker is deployed separately and processes queued payouts.
+
+Observed behavior in live environment:
+
+- Payout requests are created in `pending`.
+- Worker picks tasks and transitions payouts to `completed`/`failed`.
+- Held balance decreases on success, and failed payouts are refunded back to available balance.
+
+Notes:
+
+- Amount input in UI is INR and converted to paise before API submission.
+- Merchant IDs `1`, `2`, and `3` are seeded for demo/testing.
