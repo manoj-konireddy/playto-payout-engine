@@ -1,7 +1,1 @@
-#!/usr/bin/env bash
-set -o errexit
-
-pip install -r requirements.txt
-python backend/manage.py migrate
-python backend/manage.py seed_data
-python backend/manage.py collectstatic --noinput
+#!/usr/bin/env bashset -o errexitpip install -r requirements.txtpython backend/manage.py migratepython backend/manage.py seed_datapython backend/manage.py collectstatic --noinput
