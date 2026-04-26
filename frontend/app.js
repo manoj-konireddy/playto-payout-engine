@@ -9,7 +9,7 @@ function fmtPaise(paise) {
 function App() {
   const [merchantId, setMerchantId] = useState(defaultMerchantId);
   const [dashboard, setDashboard] = useState(null);
-  const [amount, setAmount] = useState("");
+  const [amountInr, setAmountInr] = useState("");
   const [bankAccountId, setBankAccountId] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -47,8 +47,13 @@ function App() {
     setBusy(true);
     setError("");
     try {
+      const parsedInr = Number.parseFloat(amountInr);
+      if (Number.isNaN(parsedInr) || parsedInr <= 0) {
+        setError("Enter a valid INR amount greater than 0");
+        return;
+      }
       const body = {
-        amount_paise: Number(amount),
+        amount_paise: Math.round(parsedInr * 100),
         bank_account_id: Number(bankAccountId),
       };
       const res = await fetch("/api/v1/payouts", {
@@ -63,7 +68,7 @@ function App() {
       if (!res.ok) {
         setError(data.error || "Payout request failed");
       } else {
-        setAmount("");
+        setAmountInr("");
       }
       await loadDashboard();
     } finally {
@@ -103,10 +108,11 @@ function App() {
           <input
             className="border rounded px-3 py-2"
             type="number"
-            min="1"
-            placeholder="Amount in paise"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            min="0.01"
+            step="0.01"
+            placeholder="Amount in INR (e.g. 100.00)"
+            value={amountInr}
+            onChange={(e) => setAmountInr(e.target.value)}
             required
           />
           <select
@@ -129,6 +135,7 @@ function App() {
             {busy ? "Submitting..." : "Request payout"}
           </button>
         </form>
+        <p className="text-xs text-slate-500 mt-2">Input is INR. API receives paise (INR * 100).</p>
         {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
       </section>
 
